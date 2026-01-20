@@ -1,9 +1,8 @@
 import path from "node:path";
 import HtmlWebpackPlugin from "html-webpack-plugin";
-import type webpack from "webpack";
 import "webpack-dev-server";
 
-const config: webpack.Configuration = {
+const config = {
 	mode: "development",
 	entry: ["./src/index.ts", "./src/styles.css"],
 	output: {

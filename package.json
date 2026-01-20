@@ -1,5 +1,6 @@
 {
 	"name": "warhammer-calc",
+	"type": "module",
 	"version": "1.0.0",
 	"description": "Warhammer Calc Webapp",
 	"main": "index",
@@ -36,8 +37,8 @@
 		"build-webpage": "webpack",
 		"build": "npx tsc -p ./src/utils/ && node ./src/utils/dist/download-spec.js --redownload && webpack",
 		"start": "webpack serve",
-		"build-spec": "ts-node src/utils/download-spec.ts",
-		"redownload-spec": "ts-node src/utils/download-spec.ts --redownload"
+		"build-spec": "npx tsc -p ./src/utils/ && node ./src/utils/dist/download-spec.js",
+		"redownload-spec": "npx tsc -p ./src/utils/ && node ./src/utils/dist/download-spec.js --redownload"
 	},
 	"dependencies": {
 		"chart.js": "^4.5.1",

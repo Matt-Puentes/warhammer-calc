@@ -88,7 +88,8 @@ async function parseData(dataDir: string) {
 }
 
 async function main(args: string[]) {
-	// Ensure data directory exists
+	// Ensure data directory exists. I go up 2 directories because the dist dir this directory gets compiled into
+	//  is another layer away. This feels hacky but it works so whatever
 	const dataDir = path.resolve(__dirname, "../../data");
 	if (!fs_sync.existsSync(dataDir)) await fs.mkdir(dataDir);
 

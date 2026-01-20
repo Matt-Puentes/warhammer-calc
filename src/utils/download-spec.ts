@@ -15,12 +15,8 @@ async function downloadSpecFiles(dataDir: string) {
 			console.log(`Downloading ${filename}...`);
 			const response = await fetch(sourceUrl);
 
-			if (!response.ok) {
-				throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-			}
-			if (response.body === null) {
-				throw new Error("Empty response body");
-			}
+			if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+			if (response.body === null) throw new Error("Empty response body");
 
 			const filePath = path.join(dataDir, `${filename}.csv`);
 			const fileStream = fs_sync.createWriteStream(filePath);
@@ -38,19 +34,15 @@ async function downloadSpecFiles(dataDir: string) {
 
 /// Parsing the downloaded CSVs in the /data directory to the JSON format expected by the webapp
 async function parseData(dataDir: string) {
-	// Load Datasheet / Model / Wargear info
+	// Load specified headers from CSVs
 	const datasheets = await parse_csv("Datasheets", ["id", "name", "faction_id"]);
 	const factions = await parse_csv("Factions", ["id", "name"]);
 	const models = await parse_csv("Datasheets_models", ["datasheet_id", "T", "Sv", "inv_sv", "W", "name"]);
 	const wargear = await parse_csv("Datasheets_wargear", ["datasheet_id", "name", "type", "A", "BS_WS", "S", "AP", "D"]);
 
-	// const data: ((typeof datasheets)[number] & (typeof models)[number] & { gear_options: typeof wargear })[] = [];
-	// data.push({ ...sheet, ...model, gear_options });
-	type Factions = (typeof datasheets)[number]["faction_id"];
-	const modelsByFaction: Record<
-		Factions,
-		Record<string, (typeof models)[number] & { gear_options: typeof wargear }>
-	> = {};
+	// Store wargear with their models, and models by their faction IDs.
+	type Model = (typeof models)[number] & { gear_options: typeof wargear };
+	const modelsByFaction: Record<string, Record<string, Model>> = {};
 	for (const sheet of datasheets) {
 		// Get faction name from ID
 		const faction = factions.find((faction) => faction.id === sheet.faction_id)?.name;
@@ -65,7 +57,7 @@ async function parseData(dataDir: string) {
 
 		// Get all Wargear options for this Model
 		const gear_options = wargear.filter((gear) => gear.datasheet_id === sheet.id);
-		if (model === undefined) {
+		if (gear_options === undefined) {
 			console.error(`Could not find gear for Datasheet ${sheet.id} (${sheet.name}).`);
 			continue;
 		}
@@ -74,7 +66,7 @@ async function parseData(dataDir: string) {
 			continue;
 		}
 
-		// Add
+		// Store models by faction name
 		if (!(faction in modelsByFaction)) modelsByFaction[faction] = {};
 		modelsByFaction[faction][model.name] = { ...model, gear_options };
 	}

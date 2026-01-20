@@ -43,7 +43,7 @@ class WarhammerDieRoller {
 		const button = document.getElementById("rollButton");
 		button?.addEventListener("click", roll_40k);
 
-		const faction_options = Object.keys(this.WarhammerData);
+		const faction_options = Object.keys(this.WarhammerData).sort();
 
 		// Input DIVs
 		this.attackerInput = document.getElementById("attackerSelection") as HTMLDivElement | undefined;
@@ -90,7 +90,9 @@ class WarhammerDieRoller {
 		}
 		this.setSelectOptions(
 			this.attackerModelSelect,
-			Object.entries(models).map(([_key, val]) => val.name ?? " xxx "),
+			Object.entries(models)
+				.map(([_key, val]) => val.name ?? "?")
+				.sort(),
 		);
 
 		this.selectAttackerModel();
@@ -104,9 +106,16 @@ class WarhammerDieRoller {
 			this.resetOptions(this.attackerWeaponSelect, "Model");
 			return;
 		}
+
+		const gear_options = model.gear_options
+			.map((val) => {
+				return { label: `(${val.type ?? "?"}) ${val.name ?? "?"}`, val: val.name ?? "?" };
+			})
+			.sort((a, b) => a.label.localeCompare(b.label));
 		this.setSelectOptions(
 			this.attackerWeaponSelect,
-			model.gear_options.map((val) => val.name ?? " xxx "),
+			gear_options.map((val) => val.label),
+			gear_options.map((val) => val.val),
 		);
 	}
 
@@ -119,7 +128,9 @@ class WarhammerDieRoller {
 		}
 		this.setSelectOptions(
 			this.defenderModelSelect,
-			Object.entries(models).map(([_key, val]) => val.name ?? " xxx "),
+			Object.entries(models)
+				.map(([_key, val]) => val.name ?? "?")
+				.sort(),
 		);
 	}
 
@@ -131,12 +142,17 @@ class WarhammerDieRoller {
 		else if (selectionElement === "defenderModel") undefined;
 	}
 
-	setSelectOptions(select: HTMLSelectElement | undefined, options: string[]) {
+	setSelectOptions(select: HTMLSelectElement | undefined, optionLabels: string[], optionValues?: string[]) {
+		if (optionValues === undefined) optionValues = optionLabels;
+		if (optionValues.length !== optionLabels.length)
+			throw Error("Option labels array must be the same length as option values array");
+
 		if (select === undefined) throw Error("Selection element undefined");
-		select.innerHTML = options.reduce(
-			(acc, currVal) => `${acc}\n<option value="${currVal}">${currVal}</option>`,
-			"<option value='' selected>-- pick an option --</option>",
-		);
+		let htmlStr = "<option value='' selected>-- pick an option --</option>";
+		for (const index in optionLabels) {
+			htmlStr += `\n<option value="${optionValues[index]}">${optionLabels[index]}</option>`;
+		}
+		select.innerHTML = htmlStr;
 	}
 
 	resetOptions(select: HTMLSelectElement | undefined, parentName: string) {

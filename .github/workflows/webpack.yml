@@ -26,3 +26,14 @@ jobs:
       run: |
         npm install -D
         npm run build
+  deploy:
+    environment:
+      name: warhammer-calc
+      url: ${{ steps.deployment.outputs.page_url }}
+      path: ./dist
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

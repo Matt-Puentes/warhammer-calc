@@ -36,7 +36,8 @@
 		"build-webpage": "webpack",
 		"build": "ts-node src/utils/download-spec.ts --redownload && webpack",
 		"start": "webpack serve",
-		"download-spec": "ts-node src/utils/download-spec.ts"
+		"build-spec": "ts-node src/utils/download-spec.ts",
+		"redownload-spec": "ts-node src/utils/download-spec.ts --redownload"
 	},
 	"dependencies": {
 		"chart.js": "^4.5.1",

@@ -1,5 +1,5 @@
 import * as fs_sync from "node:fs";
-import * as fs from "node:fs";
+import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import { finished } from "node:stream/promises";
 import fetch from "node-fetch";
@@ -79,21 +79,20 @@ async function parseData(dataDir: string) {
 		modelsByFaction[faction][model.name] = { ...model, gear_options };
 	}
 
-	fs.writeFile(path.join(dataDir, "Parsed_output.json"), JSON.stringify(modelsByFaction, null, 2), (err) => {
-		if (err) throw err;
+	try {
+		await fs.writeFile(path.join(dataDir, "Parsed_output.json"), JSON.stringify(modelsByFaction, null, 2));
 		console.log("The file has been saved!");
-	});
+	} catch (e) {
+		console.error(`Generating Parsed_output.json failed ${e}`);
+	}
 }
 
 async function main(args: string[]) {
 	// Ensure data directory exists
 	const dataDir = path.resolve(__dirname, "../data");
-	if (!fs_sync.existsSync(dataDir)) {
-		throw Error("No Data Directory Found.");
-	}
+	if (!fs_sync.existsSync(dataDir)) await fs.mkdir(dataDir);
 
 	if (args.includes("--redownload")) await downloadSpecFiles(dataDir);
-	console.log(args);
 	await parseData(dataDir);
 }
 

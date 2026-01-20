@@ -89,7 +89,7 @@ async function parseData(dataDir: string) {
 
 async function main(args: string[]) {
 	// Ensure data directory exists
-	const dataDir = path.resolve(__dirname, "../data");
+	const dataDir = path.resolve(__dirname, "../../data");
 	if (!fs_sync.existsSync(dataDir)) await fs.mkdir(dataDir);
 
 	if (args.includes("--redownload")) await downloadSpecFiles(dataDir);

@@ -34,7 +34,7 @@
 	"scripts": {
 		"dev": "webpack serve",
 		"build-webpage": "webpack",
-		"build": "ts-node src/utils/download-spec.ts --redownload && webpack",
+		"build": "npx tsc -p ./src/utils/ && node ./src/utils/dist/download-spec.js --redownload && webpack",
 		"start": "webpack serve",
 		"build-spec": "ts-node src/utils/download-spec.ts",
 		"redownload-spec": "ts-node src/utils/download-spec.ts --redownload"

@@ -5,6 +5,7 @@
         "moduleResolution": "node",
         "esModuleInterop": true,
         "strict": true,
+        "outDir": "./dist",
     },
     "include": [
         "./*"
@@ -13,4 +14,5 @@
         "node_modules",
         "./dist/"
     ]
+    
 }
